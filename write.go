@@ -127,6 +127,9 @@ func (wac *Conn) write(messageType int, answerMessageTag string, data []byte) (<
 		wac.listener.Unlock()
 	}
 
+	if wac == nil || wac.ws == nil {
+		return nil, errors.New("nil websocket")
+	}
 	wac.ws.Lock()
 	err := wac.ws.conn.WriteMessage(messageType, data)
 	wac.ws.Unlock()
