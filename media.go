@@ -14,8 +14,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/Rhymen/go-whatsapp/crypto/cbc"
-	"github.com/Rhymen/go-whatsapp/crypto/hkdf"
+	"github.com/gabstv/go-whatsapp/crypto/cbc"
+	"github.com/gabstv/go-whatsapp/crypto/hkdf"
 )
 
 func Download(url string, mediaKey []byte, appInfo MediaType, fileLength int) ([]byte, error) {
@@ -130,10 +130,10 @@ func (wac *Conn) queryMediaConn() (hostname, auth string, ttl int, err error) {
 }
 
 var mediaTypeMap = map[MediaType]string{
-	MediaImage: "/mms/image",
-	MediaVideo: "/mms/video",
+	MediaImage:    "/mms/image",
+	MediaVideo:    "/mms/video",
 	MediaDocument: "/mms/document",
-	MediaAudio: "/mms/audio",
+	MediaAudio:    "/mms/audio",
 }
 
 func (wac *Conn) Upload(reader io.Reader, appInfo MediaType) (downloadURL string, mediaKey []byte, fileEncSha256 []byte, fileSha256 []byte, fileLength uint64, err error) {
