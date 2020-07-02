@@ -231,7 +231,12 @@ func (wac *Conn) Login(qrChan chan<- string) (Session, error) {
 		return session, fmt.Errorf("error decoding login resp: %v\n", err)
 	}
 
-	ref := resp["ref"].(string)
+	var ref string
+	if rref, ok := resp["ref"].(string); ok {
+		ref = rref
+	} else {
+		return session, fmt.Errorf("error decoding login resp: invalid resp['ref']\n")
+	}
 
 	priv, pub, err := curve25519.GenerateKey()
 	if err != nil {
