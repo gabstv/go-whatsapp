@@ -156,8 +156,8 @@ func (wac *Conn) connect() (err error) {
 	}()
 
 	dialer := &websocket.Dialer{
-		ReadBufferSize:   256 * 1024,
-		WriteBufferSize:  128 * 1024,
+		ReadBufferSize:   0,
+		WriteBufferSize:  0,
 		HandshakeTimeout: wac.msgTimeout,
 		Proxy:            wac.Proxy,
 	}
