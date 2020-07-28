@@ -81,7 +81,7 @@ func (wac *Conn) Send(msg interface{}) (string, error) {
 			return "ERROR", fmt.Errorf("error decoding sending response: %v\n", err)
 		}
 		if int(resp["status"].(float64)) != 200 {
-			return "ERROR", fmt.Errorf("message sending responded with %d", resp["status"])
+			return "ERROR", fmt.Errorf("message sending responded with %v", resp["status"])
 		}
 		if int(resp["status"].(float64)) == 200 {
 			return getMessageInfo(msgProto).Id, nil
