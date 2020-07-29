@@ -142,23 +142,32 @@ func (wac *Conn) deleteChatProto(remotejid, msgid string, fromMe bool) (<-chan s
 		owner = "false"
 	}
 	n := binary.Node{
-		Description: "chat",
+		Description: "action",
 		Attributes: map[string]string{
-			"type":  "clear",
-			"jid":   remotejid,
-			"media": "true",
+			"epoch": strconv.Itoa(wac.msgCount),
+			"type":  "set",
 		},
 		Content: []interface{}{
 			binary.Node{
-				Description: "item",
+				Description: "chat",
 				Attributes: map[string]string{
-					"owner": owner,
-					"index": msgid,
+					"type":  "clear",
+					"jid":   remotejid,
+					"media": "true",
+				},
+				Content: []interface{}{
+					binary.Node{
+						Description: "item",
+						Attributes: map[string]string{
+							"owner": owner,
+							"index": msgid,
+						},
+					},
 				},
 			},
 		},
 	}
-	return wac.writeBinary(n, chat, ignore, tag)
+	return wac.writeBinary(n, chat, expires|skipOffline, tag)
 }
 
 func init() {
