@@ -68,6 +68,7 @@ func (wac *Conn) processReadData(msgType int, msg []byte) error {
 
 	wac.listener.RLock()
 	listener, hasListener := wac.listener.m[data[0]]
+	println("DATA0->>", data[0])
 	wac.listener.RUnlock()
 
 	if hasListener {
