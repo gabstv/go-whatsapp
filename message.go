@@ -155,8 +155,8 @@ func (wac *Conn) deleteChatProto(remotejid, msgid string, fromMe bool) (<-chan s
 					"jid":   remotejid,
 					"media": "true",
 				},
-				Content: []interface{}{
-					binary.Node{
+				Content: []binary.Node{
+					{
 						Description: "item",
 						Attributes: map[string]string{
 							"owner": owner,
