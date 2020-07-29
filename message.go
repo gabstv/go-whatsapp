@@ -123,10 +123,11 @@ func (wac *Conn) DeleteSingleMessage(remotejid, msgid string, fromMe bool) error
 			return fmt.Errorf("message sending responded with %v", resp["status"])
 		}
 		if int(resp["status"].(float64)) == 200 {
+			println("MESSAGE DELETED!!!")
 			return nil
 		}
 	// case <-time.After(wac.msgTimeout):
-	case <-time.After(time.Second * 20):
+	case <-time.After(time.Second * 40):
 		return fmt.Errorf("sending message timed out")
 	}
 
@@ -134,8 +135,7 @@ func (wac *Conn) DeleteSingleMessage(remotejid, msgid string, fromMe bool) error
 }
 
 func (wac *Conn) deleteChatProto(remotejid, msgid string, fromMe bool) (<-chan string, error) {
-	ts := time.Now().Unix()
-	tag := fmt.Sprintf("%d.--%d", ts, wac.msgCount)
+	tag := fmt.Sprintf("%s.--%d", wac.timeTag, wac.msgCount)
 
 	owner := "true"
 	if !fromMe {
@@ -158,7 +158,7 @@ func (wac *Conn) deleteChatProto(remotejid, msgid string, fromMe bool) (<-chan s
 			},
 		},
 	}
-	return wac.writeBinary(n, message, ignore, tag)
+	return wac.writeBinary(n, chat, ignore, tag)
 }
 
 func init() {
