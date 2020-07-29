@@ -136,6 +136,7 @@ func (wac *Conn) DeleteSingleMessage(remotejid, msgid string, fromMe bool) error
 
 func (wac *Conn) deleteChatProto(remotejid, msgid string, fromMe bool) (<-chan string, error) {
 	tag := fmt.Sprintf("%s.--%d", wac.timeTag, wac.msgCount)
+	println(tag)
 
 	owner := "true"
 	if !fromMe {
