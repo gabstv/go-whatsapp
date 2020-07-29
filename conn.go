@@ -84,8 +84,8 @@ type Conn struct {
 	handler        []Handler
 	msgCount       int
 	msgTimeout     time.Duration
-	Info           *Info
-	Store          *Store
+	info           *Info
+	store          *Store
 	ServerLastSeen time.Time
 
 	timeTag  string // last 3 digits obtained after a successful login takeover
@@ -105,13 +105,23 @@ type Conn struct {
 func (wac *Conn) UpdateBatteryInfo(message BatteryMessage) {
 	wac.infoLock.Lock()
 	defer wac.infoLock.Unlock()
-	nfo := wac.Info
+	nfo := wac.info
 	if nfo == nil {
 		nfo = &Info{}
 	}
 	nfo.Battery = message.Percentage
 	nfo.Plugged = message.Plugged
 	nfo.PowerSave = message.Powersave
+}
+
+func (wac *Conn) Info() *Info {
+	wac.infoLock.Lock()
+	defer wac.infoLock.Unlock()
+	return wac.info
+}
+
+func (wac *Conn) Store() *Store {
+	return wac.store
 }
 
 type websocketWrapper struct {
@@ -134,7 +144,7 @@ func NewConn(timeout time.Duration) (*Conn, error) {
 		handler:    make([]Handler, 0),
 		msgCount:   0,
 		msgTimeout: timeout,
-		Store:      newStore(),
+		store:      newStore(),
 
 		longClientName:  "github.com/gabstv/go-whatsapp",
 		shortClientName: "go-whatsapp",
@@ -149,7 +159,7 @@ func NewConnWithProxy(timeout time.Duration, proxy func(*http.Request) (*url.URL
 		handler:    make([]Handler, 0),
 		msgCount:   0,
 		msgTimeout: timeout,
-		Store:      newStore(),
+		store:      newStore(),
 
 		longClientName:  "github.com/gabstv/go-whatsapp",
 		shortClientName: "go-whatsapp",

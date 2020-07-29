@@ -267,7 +267,7 @@ func (wac *Conn) Login(qrChan chan<- string) (Session, error) {
 	info := resp2[1].(map[string]interface{})
 
 	wac.infoLock.Lock()
-	wac.Info = newInfoFromReq(info)
+	wac.info = newInfoFromReq(info)
 	wac.infoLock.Unlock()
 
 	session.ClientToken = info["clientToken"].(string)
@@ -477,7 +477,7 @@ func (wac *Conn) Restore() error {
 	info := connResp[1].(map[string]interface{})
 
 	wac.infoLock.Lock()
-	wac.Info = newInfoFromReq(info)
+	wac.info = newInfoFromReq(info)
 	wac.infoLock.Unlock()
 
 	//set new tokens

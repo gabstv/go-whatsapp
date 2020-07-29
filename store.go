@@ -1,8 +1,9 @@
 package whatsapp
 
 import (
-	"github.com/gabstv/go-whatsapp/binary"
 	"strings"
+
+	"github.com/gabstv/go-whatsapp/binary"
 )
 
 type Store struct {
@@ -46,7 +47,7 @@ func (wac *Conn) updateContacts(contacts interface{}) {
 		}
 
 		jid := strings.Replace(contactNode.Attributes["jid"], "@c.us", "@s.whatsapp.net", 1)
-		wac.Store.Contacts[jid] = Contact{
+		wac.store.Contacts[jid] = Contact{
 			jid,
 			contactNode.Attributes["notify"],
 			contactNode.Attributes["name"],
@@ -68,7 +69,7 @@ func (wac *Conn) updateChats(chats interface{}) {
 		}
 
 		jid := strings.Replace(chatNode.Attributes["jid"], "@c.us", "@s.whatsapp.net", 1)
-		wac.Store.Chats[jid] = Chat{
+		wac.store.Chats[jid] = Chat{
 			jid,
 			chatNode.Attributes["name"],
 			chatNode.Attributes["count"],

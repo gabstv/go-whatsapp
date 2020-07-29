@@ -2,9 +2,10 @@ package whatsapp
 
 import (
 	"fmt"
-	"github.com/gabstv/go-whatsapp/binary"
 	"strconv"
 	"time"
+
+	"github.com/gabstv/go-whatsapp/binary"
 )
 
 // Pictures must be JPG 640x640 and 96x96, respectively
@@ -21,7 +22,7 @@ func (wac *Conn) UploadProfilePic(image, preview []byte) (<-chan string, error) 
 				Description: "picture",
 				Attributes: map[string]string{
 					"id":   tag,
-					"jid":  wac.Info.Wid,
+					"jid":  wac.info.Wid,
 					"type": "set",
 				},
 				Content: []binary.Node{
