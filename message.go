@@ -105,9 +105,45 @@ func (wac *Conn) sendProto(p *proto.WebMessageInfo) (<-chan string, error) {
 	return wac.writeBinary(n, message, ignore, p.Key.GetId())
 }
 
-// GABS:
+// RevokeMessage revokes a message (marks as "message removed") for everyone
+func (wac *Conn) RevokeMessage(remotejid, msgid string, fromme bool) (revokeid string, err error) {
+	// create a revocation ID (required)
+	rawrevocationID := make([]byte, 10)
+	rand.Read(rawrevocationID)
+	revocationID := strings.ToUpper(hex.EncodeToString(rawrevocationID))
+	//
+	ts := uint64(time.Now().Unix())
+	status := proto.WebMessageInfo_PENDING
+	mtype := proto.ProtocolMessage_REVOKE
 
-func (wac *Conn) DeleteSingleMessage(remotejid, msgid string, fromMe bool) error {
+	revoker := &proto.WebMessageInfo{
+		Key: &proto.MessageKey{
+			FromMe:    &fromme,
+			Id:        &revocationID,
+			RemoteJid: &remotejid,
+		},
+		MessageTimestamp: &ts,
+		Message: &proto.Message{
+			ProtocolMessage: &proto.ProtocolMessage{
+				Type: &mtype,
+				Key: &proto.MessageKey{
+					FromMe:    &fromme,
+					Id:        &msgid,
+					RemoteJid: &remotejid,
+				},
+			},
+		},
+		Status: &status,
+	}
+	if _, err := wac.Send(revoker); err != nil {
+		return revocationID, err
+	}
+	return revocationID, nil
+}
+
+// DeleteMessage deletes a single message for the user (removes the msgbox). To
+// delete the message for everyone, use RevokeMessage
+func (wac *Conn) DeleteMessage(remotejid, msgid string, fromMe bool) error {
 	ch, err := wac.deleteChatProto(remotejid, msgid, fromMe)
 	if err != nil {
 		return fmt.Errorf("could not send proto: %v", err)
@@ -117,17 +153,16 @@ func (wac *Conn) DeleteSingleMessage(remotejid, msgid string, fromMe bool) error
 	case response := <-ch:
 		var resp map[string]interface{}
 		if err = json.Unmarshal([]byte(response), &resp); err != nil {
-			return fmt.Errorf("error decoding sending response: %v\n", err)
+			return fmt.Errorf("error decoding deletion response: %v", err)
 		}
 		if int(resp["status"].(float64)) != 200 {
-			return fmt.Errorf("message sending responded with %v", resp["status"])
+			return fmt.Errorf("message deletion responded with %v", resp["status"])
 		}
 		if int(resp["status"].(float64)) == 200 {
 			return nil
 		}
-	// case <-time.After(wac.msgTimeout):
-	case <-time.After(time.Second * 6):
-		return fmt.Errorf("(DEL) sending message timed out")
+	case <-time.After(wac.msgTimeout):
+		return fmt.Errorf("deleting message timed out")
 	}
 
 	return nil
