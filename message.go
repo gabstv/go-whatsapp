@@ -125,7 +125,8 @@ func (wac *Conn) DeleteSingleMessage(remotejid, msgid string, fromMe bool) error
 		if int(resp["status"].(float64)) == 200 {
 			return nil
 		}
-	case <-time.After(wac.msgTimeout):
+	// case <-time.After(wac.msgTimeout):
+	case <-time.After(time.Second * 20):
 		return fmt.Errorf("sending message timed out")
 	}
 
