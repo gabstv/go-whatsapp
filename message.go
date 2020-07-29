@@ -123,7 +123,6 @@ func (wac *Conn) DeleteSingleMessage(remotejid, msgid string, fromMe bool) error
 			return fmt.Errorf("message sending responded with %v", resp["status"])
 		}
 		if int(resp["status"].(float64)) == 200 {
-			println("MESSAGE DELETED!!!")
 			return nil
 		}
 	// case <-time.After(wac.msgTimeout):
@@ -136,7 +135,6 @@ func (wac *Conn) DeleteSingleMessage(remotejid, msgid string, fromMe bool) error
 
 func (wac *Conn) deleteChatProto(remotejid, msgid string, fromMe bool) (<-chan string, error) {
 	tag := fmt.Sprintf("%s.--%d", wac.timeTag, wac.msgCount)
-	println(tag)
 
 	owner := "true"
 	if !fromMe {
