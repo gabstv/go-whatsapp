@@ -127,8 +127,8 @@ func (wac *Conn) DeleteSingleMessage(remotejid, msgid string, fromMe bool) error
 			return nil
 		}
 	// case <-time.After(wac.msgTimeout):
-	case <-time.After(time.Second * 40):
-		return fmt.Errorf("sending message timed out")
+	case <-time.After(time.Second * 6):
+		return fmt.Errorf("(DEL) sending message timed out")
 	}
 
 	return nil

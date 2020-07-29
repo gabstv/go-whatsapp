@@ -55,6 +55,7 @@ func (wac *Conn) readPump() {
 }
 
 func (wac *Conn) processReadData(msgType int, msg []byte) error {
+	println("processReadData")
 	data := strings.SplitN(string(msg), ",", 2)
 
 	if data[0][0] == '!' { //Keep-Alive Timestamp
@@ -68,7 +69,7 @@ func (wac *Conn) processReadData(msgType int, msg []byte) error {
 
 	wac.listener.RLock()
 	listener, hasListener := wac.listener.m[data[0]]
-	println("DATA0->>", data[0])
+	println("DATA0IN->>", data[0])
 	wac.listener.RUnlock()
 
 	if hasListener {
