@@ -47,6 +47,7 @@ type Info struct {
 	Tos       int
 	Lg        string
 	Is24h     bool
+	PowerSave bool // TODO: check if powersave is == is24h
 }
 
 type PhoneInfo struct {
@@ -265,7 +266,9 @@ func (wac *Conn) Login(qrChan chan<- string) (Session, error) {
 
 	info := resp2[1].(map[string]interface{})
 
+	wac.infoLock.Lock()
 	wac.Info = newInfoFromReq(info)
+	wac.infoLock.Unlock()
 
 	session.ClientToken = info["clientToken"].(string)
 	session.ServerToken = info["serverToken"].(string)
@@ -473,7 +476,9 @@ func (wac *Conn) Restore() error {
 
 	info := connResp[1].(map[string]interface{})
 
+	wac.infoLock.Lock()
 	wac.Info = newInfoFromReq(info)
+	wac.infoLock.Unlock()
 
 	//set new tokens
 	wac.session.ClientToken = info["clientToken"].(string)

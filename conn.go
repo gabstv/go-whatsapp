@@ -88,7 +88,8 @@ type Conn struct {
 	Store          *Store
 	ServerLastSeen time.Time
 
-	timeTag string // last 3 digits obtained after a successful login takeover
+	timeTag  string // last 3 digits obtained after a successful login takeover
+	infoLock sync.Mutex
 
 	longClientName  string
 	shortClientName string
@@ -98,6 +99,19 @@ type Conn struct {
 	Proxy            func(*http.Request) (*url.URL, error)
 
 	writerLock sync.RWMutex
+}
+
+// UpdateBatteryInfo manually updates battery info
+func (wac *Conn) UpdateBatteryInfo(message BatteryMessage) {
+	wac.infoLock.Lock()
+	defer wac.infoLock.Unlock()
+	nfo := wac.Info
+	if nfo == nil {
+		nfo = &Info{}
+	}
+	nfo.Battery = message.Percentage
+	nfo.Plugged = message.Plugged
+	nfo.PowerSave = message.Powersave
 }
 
 type websocketWrapper struct {
