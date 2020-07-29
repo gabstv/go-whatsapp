@@ -105,6 +105,61 @@ func (wac *Conn) sendProto(p *proto.WebMessageInfo) (<-chan string, error) {
 	return wac.writeBinary(n, message, ignore, p.Key.GetId())
 }
 
+// GABS:
+
+func (wac *Conn) DeleteSingleMessage(remotejid, msgid string, fromMe bool) error {
+	ch, err := wac.deleteChatProto(remotejid, msgid, fromMe)
+	if err != nil {
+		return fmt.Errorf("could not send proto: %v", err)
+	}
+
+	select {
+	case response := <-ch:
+		var resp map[string]interface{}
+		if err = json.Unmarshal([]byte(response), &resp); err != nil {
+			return fmt.Errorf("error decoding sending response: %v\n", err)
+		}
+		if int(resp["status"].(float64)) != 200 {
+			return fmt.Errorf("message sending responded with %v", resp["status"])
+		}
+		if int(resp["status"].(float64)) == 200 {
+			return nil
+		}
+	case <-time.After(wac.msgTimeout):
+		return fmt.Errorf("sending message timed out")
+	}
+
+	return nil
+}
+
+func (wac *Conn) deleteChatProto(remotejid, msgid string, fromMe bool) (<-chan string, error) {
+	ts := time.Now().Unix()
+	tag := fmt.Sprintf("%d.--%d", ts, wac.msgCount)
+
+	owner := "true"
+	if !fromMe {
+		owner = "false"
+	}
+	n := binary.Node{
+		Description: "chat",
+		Attributes: map[string]string{
+			"jid":   "relay",
+			"type":  "clear",
+			"media": "true",
+		},
+		Content: []interface{}{
+			binary.Node{
+				Description: "item",
+				Attributes: map[string]string{
+					"owner": owner,
+					"index": msgid,
+				},
+			},
+		},
+	}
+	return wac.writeBinary(n, message, ignore, tag)
+}
+
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
