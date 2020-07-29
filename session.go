@@ -380,7 +380,6 @@ func (wac *Conn) Restore() error {
 		return fmt.Errorf("error writing admin init: %v\n", err)
 	}
 
-	//FIXME: gabs: obtain last 3 digits of login takeover
 	//admin login with takeover
 	login := []interface{}{"admin", "login", wac.session.ClientToken, wac.session.ServerToken, wac.session.ClientId, "takeover"}
 	loginChan, err := wac.writeJson(login)
